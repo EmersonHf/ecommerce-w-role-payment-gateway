@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-medium title-font mb-2 text-gray-900">Editar produto</h1>
             </div>
 
-            <form action="{{route('admin.product.update', $product->id)}}" enctype="multipart/form-data" method="POST">
+            <form action="{{route('sellers.product.update', $product->id)}}" enctype="multipart/form-data" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="flex flex-wrap">
@@ -47,7 +47,7 @@
                     <div class="p-2 w-full">
                         <img src="{{ \Illuminate\Support\Facades\Storage::url($product->cover)}}" alt="">
 
-                        <a  href="{{route('admin.product.destroyImage',$product->id)}}" class="flex ml-auto  text-white bg-indigo-500 border-3 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">Deletar imagem</a>
+                        <a  href="{{route('sellers.product.destroyImage',$product->id)}}" class="flex ml-auto  text-white bg-indigo-500 border-3 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">Deletar imagem</a>
                     </div>
                     @endif
 

@@ -47,7 +47,7 @@ class SellerUserProductController extends Controller
       }
       Product::create($input);
 
-      return Redirect::route('index.products');
+      return Redirect::route('home');
     }
 
 
@@ -64,16 +64,28 @@ class SellerUserProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+      return view('auth.sellers.product_edit',[
+          'product' => $product
+      ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
+    public function update(Product $product, ProductsStoreRequest $request)
+  {
+    $input = $request->validated();
+    if(!empty($input['cover']) && $input['cover']->isValid()){
+        Storage::delete($product->cover ?? '');
+        $file = $input['cover'];
+        $path = $file->store('public');
+        $input['cover'] = $path;
+
+      }
+    $product->fill($input);
+    $product->save();
+    return Redirect::route('sellers.products');
+  }
 
     /**
      * Remove the specified resource from storage.
@@ -82,7 +94,7 @@ class SellerUserProductController extends Controller
   {
     $product ->delete();
     Storage::delete($product->cover ?? '');
-    return Redirect::route('admin.products');
+    return Redirect::route('sellers.products');
   }
 
   public function destroyImage(Product $product)
