@@ -135,7 +135,7 @@ class SellerUserProductController extends Controller
       }
     $product->fill($input);
     $product->save();
-    return Redirect::route('seller.products');
+    return Redirect::route('index.products');
   }
 
     /**
@@ -145,7 +145,7 @@ class SellerUserProductController extends Controller
   {
     $product ->delete();
     Storage::delete($product->cover ?? '');
-    return Redirect::route('seller.products');
+    return Redirect::route('index.products');
   }
 
   public function destroyImage(Product $product)

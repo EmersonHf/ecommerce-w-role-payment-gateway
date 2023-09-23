@@ -45,9 +45,11 @@ Route::middleware(['auth', 'ensureSeller'])->group(function () {
 
     Route::get('/sellers/{user}/myproducts', [SellerUserProductController::class,'myProducts'])->name('seller.products.index');
 
-    Route::get('/sellers/products/{product}/edit', [SellerUserProductController::class,'edit'])->name('seller.product.edit');
+    Route::get('/sellers/products/{product}/edit', [SellerUserProductController::class,'edit'])->name('sellers.product.edit');
+    Route::put('/admin/products/{product}', [AdminProductController::class,'update'])->name('admin.product.update');
     Route::put('/sellers/products/{product}', [SellerUserProductController::class,'update'])->name('sellers.product.update');
-Route::post('/sellers/products', [SellerUserProductController::class,'store'])->name('sellers.product.store');
+    Route::post('/sellers/products', [SellerUserProductController::class,'store'])->name('sellers.product.store');
+    Route::get('/sellers/products/{product}/delete-image',[SellerUserProductController::class,'destroyImage'])->name('sellers.product.destroyImage');
     Route::get('/sellers/products/{product}/delete', [SellerUserProductController::class,'destroy'])->name('sellers.product.destroy');
     Route::get('/sellers/products/{product}/delete-image',[SellerUserProductController::class,'destroyImage'])->name('sellers.product.destroyImage');
     // Route::resource('seller/profile', SellerProfileController::class);
