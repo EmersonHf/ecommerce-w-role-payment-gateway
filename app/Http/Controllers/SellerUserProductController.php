@@ -4,29 +4,67 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductsStoreRequest;
 use App\Models\Product;
+use App\Models\Role;
+use App\Models\Seller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class SellerUserProductController extends Controller
 {
+
+  public readonly User $user;
+  public function __construct()
+  {
+    $this->user = new User();
+  }
     /**
      * Display a listing of the resource.
      */
-    public function index()
-  {
-    $products = Product::all();
+   
+     public function sellerProducts(User $seller,Product $products)
+     {
+    
+      $seller = Auth::user();
 
-    return view('auth.sellers.products',compact('products'));
-  }
+      // Retrieve the "seller" role
+      $sellerRole = Role::where('name', 'seller')->firstOrFail();
+      
+      // Retrieve products associated with the logged-in user who has the "seller" role
+      $products = $seller->products()
+          ->where('role_id', $sellerRole->id) // Add a condition to check the role_id
+          ->get();
+     
+         return view('auth.sellers.seller.products.index', ['seller'=>$seller,'products'=>$products]);
+     }
+     public function myProducts(User $user,Product $products)
+     {
+    
+      $user = Auth::user();
 
+      // Retrieve the "seller" role
+      $sellerRole = Role::where('name', 'seller')->firstOrFail();
+      
+      // Retrieve products associated with the logged-in user who has the "seller" role
+      $products = $user->products()
+          ->where('role_id', $sellerRole->id) // Add a condition to check the role_id
+          ->get();
+     
+          return view('auth.sellers.seller.products.index', ['user' => $user, 'products' => $products]);
+     }
+
+  
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(User $seller)
     {
-    return view('auth.sellers.product_create');
+      $seller = Auth::user();
+    return view('auth.sellers.product_create',['seller'=>$seller]);
     }
 
     /**
@@ -35,7 +73,9 @@ class SellerUserProductController extends Controller
     public function store(ProductsStoreRequest $request)
     {
     $input = $request->validated();
-
+    $sellerRole = Role::where('name', 'seller')->firstOrFail();
+    $input['role_id'] = $sellerRole->id;
+    $input['user_id'] = auth()->user()->id;
      $input['slug'] = Str::slug($input['name']);
       if(!empty($input['cover']) && $input['cover']->isValid()){
         $file = $input['cover'];
@@ -54,18 +94,29 @@ class SellerUserProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(Product $products, Seller $seller)
     {
-        //
+
+      $seller = Auth::user();
+
+      // Retrieve the "seller" role
+      $sellerRole = Role::where('name', 'seller')->firstOrFail();
+      
+      // Retrieve products associated with the logged-in user who has the "seller" role
+      $products = $seller->products()
+          ->where('role_id', $sellerRole->id) // Add a condition to check the role_id
+          ->get();
+        return view('auth.sellers.seller.products.show',  ['seller'=>$seller,'products'=>$products]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit(Product $product,User $user)
     {
-      return view('auth.sellers.product_edit',[
-          'product' => $product
+      return view('auth.sellers.seller.products.edit',[
+          'product' => $product,
+          'user'=>$user
       ]);
     }
 
@@ -84,7 +135,7 @@ class SellerUserProductController extends Controller
       }
     $product->fill($input);
     $product->save();
-    return Redirect::route('sellers.products');
+    return Redirect::route('seller.products');
   }
 
     /**
@@ -94,7 +145,7 @@ class SellerUserProductController extends Controller
   {
     $product ->delete();
     Storage::delete($product->cover ?? '');
-    return Redirect::route('sellers.products');
+    return Redirect::route('seller.products');
   }
 
   public function destroyImage(Product $product)

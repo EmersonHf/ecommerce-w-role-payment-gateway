@@ -23,12 +23,15 @@ class ProductsStoreRequest extends FormRequest
      */
     public function rules()
     {
+        
         return [
           'name'=>'required|string',
           'price'=>'required|numeric',
           'stock'=>'nullable|integer',
           'cover'=>'nullable|file',
-          'description'=> 'nullable|string'
+          'description'=> 'nullable|string',
+          'role_id'=>'required',
+          'user_id'=>'required'
         ];
     }
 }

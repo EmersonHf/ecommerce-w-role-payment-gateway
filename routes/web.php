@@ -18,7 +18,7 @@ use App\Http\Controllers\SellerUserProductController;
 */
 
 Route::get('/',[ProductController::class,'index'])->name('index.products');
-Route::get('/',[HomeController::class,'index'])->name('home');
+Route::get('/query',[HomeController::class,'queryIndex'])->name('home');
 Route::get('/product/{product:slug}',[ProductController::class,'show'])->name('product');
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -40,11 +40,14 @@ Route::middleware('auth')->group(function () {
 // Route::get('/admin/products/{product}/delete-image',[AdminProductController::class,'destroyImage'])->name('admin.product.destroyImage');
 
 Route::middleware(['auth', 'ensureSeller'])->group(function () {
-    Route::get('/sellers/products', [SellerUserProductController::class, 'index'])->name('sellers.products');
-    Route::get('/sellers/products/create', [SellerUserProductController::class,'create'])->name('sellers.product.create');
-    Route::post('/sellers/products', [SellerUserProductController::class,'store'])->name('sellers.product.store');
-    Route::get('/sellers/products/{product}/edit', [SellerUserProductController::class,'edit'])->name('sellers.product.edit');
+    Route::get('/sellers/{user}/products', [SellerUserProductController::class, 'sellerProducts'])->name('seller.products');
+    Route::get('/sellers/{seller}/products/create', [SellerUserProductController::class,'create'])->name('seller.products.create');
+
+    Route::get('/sellers/{user}/myproducts', [SellerUserProductController::class,'myProducts'])->name('seller.products.index');
+
+    Route::get('/sellers/products/{product}/edit', [SellerUserProductController::class,'edit'])->name('seller.product.edit');
     Route::put('/sellers/products/{product}', [SellerUserProductController::class,'update'])->name('sellers.product.update');
+Route::post('/sellers/products', [SellerUserProductController::class,'store'])->name('sellers.product.store');
     Route::get('/sellers/products/{product}/delete', [SellerUserProductController::class,'destroy'])->name('sellers.product.destroy');
     Route::get('/sellers/products/{product}/delete-image',[SellerUserProductController::class,'destroyImage'])->name('sellers.product.destroyImage');
     // Route::resource('seller/profile', SellerProfileController::class);

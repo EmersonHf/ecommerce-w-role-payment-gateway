@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,12 +14,13 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Product $products,User $user)
     {
         // Retrieve all products
-        $products = Product::all();
 
-        return view('products.index', compact('products'));
+        $products = Product::all();
+        
+        return view('products.index', ['products'=>$products]);
     }
     public function getUserId() {
         // Assuming you have some logic to identify the user (e.g., authentication)

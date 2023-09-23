@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function queryIndex(Request $request)
     {
 
         $products = Product::query();
@@ -19,11 +20,11 @@ class HomeController extends Controller
             $query->where('name', 'like', '%' . $lv . '%');
         });
         $products = $products->get();
-
-        return view('products.index', [
-            'products' => $products
-        ]);
-    }
+        
+        
+            return redirect()->route('index.products');
+        }
+    
 
     /**
      * Show the form for creating a new resource.
