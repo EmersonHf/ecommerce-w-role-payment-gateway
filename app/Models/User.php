@@ -46,11 +46,19 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
     public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+{
+    return $this->belongsToMany(Role::class);
+}
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }
