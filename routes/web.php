@@ -18,7 +18,7 @@ use App\Http\Controllers\SellerUserProductController;
 */
 
 Route::get('/',[ProductController::class,'index'])->name('index.products');
-Route::get('/query',[HomeController::class,'queryIndex'])->name('home');
+Route::get('/query',[HomeController::class,'index'])->name('home');
 Route::get('/product/{product:slug}',[ProductController::class,'show'])->name('product');
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -29,15 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-// Admin
-// Route::get('/admin/products', [AdminProductController::class,'index'])->name('admin.products');
-
-
-// Route::post('/admin/products', [AdminProductController::class,'store'])->name('admin.product.store');
-// Route::get('/admin/products/{product}/edit', [AdminProductController::class,'edit'])->name('admin.product.edit');
-// Route::put('/admin/products/{product}', [AdminProductController::class,'update'])->name('admin.product.update');
-// Route::get('/admin/products/{product}/delete', [AdminProductController::class,'destroy'])->name('admin.product.destroy');
-// Route::get('/admin/products/{product}/delete-image',[AdminProductController::class,'destroyImage'])->name('admin.product.destroyImage');
 
 Route::middleware(['auth', 'ensureSeller'])->group(function () {
     Route::get('/sellers/{user}/products', [SellerUserProductController::class, 'sellerProducts'])->name('seller.products');
@@ -46,7 +37,6 @@ Route::middleware(['auth', 'ensureSeller'])->group(function () {
     Route::get('/sellers/{user}/myproducts', [SellerUserProductController::class,'myProducts'])->name('seller.products.index');
 
     Route::get('/sellers/products/{product}/edit', [SellerUserProductController::class,'edit'])->name('sellers.product.edit');
-    Route::put('/admin/products/{product}', [AdminProductController::class,'update'])->name('admin.product.update');
     Route::put('/sellers/products/{product}', [SellerUserProductController::class,'update'])->name('sellers.product.update');
     Route::post('/sellers/products', [SellerUserProductController::class,'store'])->name('sellers.product.store');
     Route::get('/sellers/products/{product}/delete-image',[SellerUserProductController::class,'destroyImage'])->name('sellers.product.destroyImage');
