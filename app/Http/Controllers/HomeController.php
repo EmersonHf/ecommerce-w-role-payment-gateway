@@ -11,7 +11,7 @@ class HomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function queryIndex(Request $request)
+    public function index(Request $request)
     {
 
         $products = Product::query();
@@ -20,11 +20,12 @@ class HomeController extends Controller
             $query->where('name', 'like', '%' . $lv . '%');
         });
         $products = $products->get();
-        
-        
-            return redirect()->route('index.products');
-        }
-    
+
+        return view('home', [
+            'products' => $products
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.

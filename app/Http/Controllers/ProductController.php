@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -14,7 +15,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Product $products,User $user)
+    public function index(Product $products)
     {
         // Retrieve all products
 
@@ -67,30 +68,39 @@ class ProductController extends Controller
     {
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
         $product = Product::findOrFail($id);
-
+    
         $lineItems = [];
         $totalPrice = 0;
-
+    
         $totalPrice += $product->price;
         $lineItems[] = [
             'price_data' => [
                 'currency' => 'brl',
                 'product_data' => [
                     'name' => $product->name,
-                    // 'images' =>[$product -> image ]
                 ],
                 'unit_amount' => $product->price * 100,
             ],
             'quantity' => 1,
         ];
-
+    
         $checkout_session = $stripe->checkout->sessions->create([
             'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('checkout.success', [], true) . "?session_id={CHECKOUT_SESSION_ID}",
             'cancel_url' => route('checkout.cancel', [], true),
+            'payment_intent_data' => [
+                'description' => $product->name, // Add the product name as custom data
+            ],
         ]);
 
+
+        // Update product stock when checkout is successful
+        if ($checkout_session->payment_status === 'paid') {
+            $product->stock -= 1;
+            $product->save();
+        }
+    
         // Update product stock when checkout is successful
         if ($checkout_session->payment_status === 'paid') {
             $product->stock -= 1;
@@ -100,49 +110,55 @@ class ProductController extends Controller
         if ($user_id !== null) {
             $order = new Order();
             $order->user_id = $user_id;
-        $order->status = 'unpaid';
-        $order->total_price = $totalPrice;  
-        $order->session_id = $checkout_session->id;
-
-        $order->save();
+            $order->status = 'unpaid';
+            $order->total_price = $totalPrice;  
+            $order->session_id = $checkout_session->id;
+    
+            $order->save();
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+    
         return redirect($checkout_session->url);
     }
+    
     public function success(Request $request)
     {
         $stripe = new \Stripe\StripeClient('sk_test_51N5iGAEFvalkC3Y2KmEAZRZsJ1wt684ogZ9v5lJUsbKsviuBFsO5V2CGuSHNw8u6jZC28hEoOjIpO3FK1CLuH4Wz003R3uis2z');
-
+    
         try {
             $session = $stripe->checkout->sessions->retrieve($_GET['session_id']);
-
+    
             if (!$session) {
                 throw new NotFoundHttpException;
             }
-
+    
             $customer = $session->customer_details;
-
             $order = Order::where('session_id', $session->id)->where('status', 'unpaid')->first();
-
+    
             if (!$order) {
                 throw new NotFoundHttpException;
             }
-
+    
             $order->status = 'paid';
             $order->save();
-
+    
             return view('products.checkout-success', compact('customer'));
         } catch (\Stripe\Exception\InvalidRequestException $e) {
             // Handle specific Stripe errors
             $errorMessage = $e->getMessage();
             return view('products.checkout-fail', compact('errorMessage'));
+        } catch (NotFoundHttpException $e) {
+            // Handle not found exceptions
+            return view('products.checkout-fail', ['errorMessage' => 'Resource not found']);
+        } catch (Exception $e) {
+            // Handle other exceptions
+            return view('products.checkout-fail', ['errorMessage' => $e->getMessage()]);
         }
     }
     public function cancel()
     {
-        return redirect()->route('home')->with('message', 'Checkout canceled.');
+        return redirect()->route('index.products')->with('message', 'Checkout canceled.');
     }
 
     /**
