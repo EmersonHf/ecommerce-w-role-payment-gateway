@@ -30,7 +30,7 @@
                         </a>
                         <div class="mt-4">
                             <h2 class="text-gray-900 title-font text-lg font-medium">{{ $product->name }}</h2>
-                            <p class="mt-1">{{ $product->price }}</p>
+                            <p class="mt-1">R${{ $product->price }}</p>
                         </div>
                         <a href="{{ route('product', $product->slug) }}"
                             class="mt-3 text-indigo-500 inline-flex items-center">Ver mais

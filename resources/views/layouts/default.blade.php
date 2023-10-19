@@ -27,32 +27,43 @@
 
                         <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
                             @auth
-                                @if (isset($role))
-                                    <p class="text-sm text-gray-600">Logged in as {{ ucfirst($role) }}</p>
-                                @endif
+                                <nav x-data="{ open: false }"
+                                    class="bg-white  border-b ">
+                                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        <div class="flex justify-between h-16">
+                                            <div class="flex">
+                                                
+                                                <div class="hidden sm:flex sm:items-center sm:ml-6">
+                                                    <x-seller-products-link />
+                                                    {{-- <a href="{{ route('seller.clients.index', ['seller' => Auth::user()->id]) }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-black-500">Clients</a> --}}
+                                                    <form method="POST" action="{{ route('logout') }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-black-500">Logout</button>
+                                                    </form>
+                                                </div>
+                                                
+                                            @else
+                                                <a href="{{ route('login') }}"
+                                                    class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log
+                                                    in</a>
 
-                                <x-seller-products-link/>
-                              
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit"
-                                        class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Logout</button>
-                                </form>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log
-                                    in</a>
-
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}"
-                                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
-                                @endif
+                                                @if (Route::has('register'))
+                                                    <a href="{{ route('register') }}"
+                                                        class="ml-4 font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </nav>
                             @endauth
+
                         </div>
                     @endif
                 </div>
             </div>
         </div>
+
     </header>
     @yield('content')
     <footer class="text-gray-600">
@@ -89,8 +100,7 @@
                     <a class="ml-3 text-gray-500">
                         <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
-                            <rect width="20" height="20" x="2" y="2" rx="5"
-                                ry="5"></rect>
+                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
                             <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
                         </svg>
                     </a>

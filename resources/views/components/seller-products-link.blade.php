@@ -1,6 +1,6 @@
 <div>                
     @if (Auth::user() && Auth::user()->hasRole('seller'))
-        <a href="{{ route('seller.products.index', ['user' => Auth::user()->id]) }}"
+        <a href="{{ route('seller.products.index', ['seller' => Auth::user()->id]) }}"
             class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base md:mt-0">My
             Products
             <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

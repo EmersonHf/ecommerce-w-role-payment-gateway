@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductsStoreRequest;
+
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\Seller;
@@ -25,8 +26,8 @@ class SellerUserProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-   
-     public function sellerProducts(User $seller,Product $products)
+
+     public function index(User $seller,Product $products)
      {
     
       $seller = Auth::user();
@@ -39,23 +40,9 @@ class SellerUserProductController extends Controller
           ->where('role_id', $sellerRole->id) // Add a condition to check the role_id
           ->get();
      
-         return view('auth.sellers.seller.products.index', ['seller'=>$seller,'products'=>$products]);
+          return view('auth.sellers.seller.products.index', ['seller' => $seller, 'products' => $products]);
      }
-     public function myProducts(User $user,Product $products)
-     {
-    
-      $user = Auth::user();
-
-      // Retrieve the "seller" role
-      $sellerRole = Role::where('name', 'seller')->firstOrFail();
-      
-      // Retrieve products associated with the logged-in user who has the "seller" role
-      $products = $user->products()
-          ->where('role_id', $sellerRole->id) // Add a condition to check the role_id
-          ->get();
      
-          return view('auth.sellers.seller.products.index', ['user' => $user, 'products' => $products]);
-     }
 
   
     /**
@@ -64,8 +51,9 @@ class SellerUserProductController extends Controller
     public function create(User $seller)
     {
       $seller = Auth::user();
-    return view('auth.sellers.product_create',['seller'=>$seller]);
+    return view('auth.sellers.seller.products.product_create',['seller'=>$seller]);
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -112,20 +100,26 @@ class SellerUserProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product,User $user)
+
+    public function edit($productId)
     {
-      return view('auth.sellers.seller.products.edit',[
-          'product' => $product,
-          'user'=>$user
-      ]);
+      $product = Product::find($productId);
+      $seller = Auth::user();
+  
+      if (!$product) {
+          // Handle the case when the product doesn't exist (e.g., show an error page or redirect)
+      }
+  
+      return view('auth.sellers.seller.products.edit', compact('product', 'seller'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Product $product, ProductsStoreRequest $request)
+    public function update(User $seller, Product $product, ProductsStoreRequest $request)
   {
     $input = $request->validated();
+
     if(!empty($input['cover']) && $input['cover']->isValid()){
         Storage::delete($product->cover ?? '');
         $file = $input['cover'];
@@ -135,7 +129,8 @@ class SellerUserProductController extends Controller
       }
     $product->fill($input);
     $product->save();
-    return Redirect::route('index.products');
+
+    return Redirect::route('index.products', compact('product', 'seller'));
   }
 
     /**
